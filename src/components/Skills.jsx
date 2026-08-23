@@ -12,7 +12,7 @@ import {
   FaHtml5,
   FaCss3Alt,
   FaJsSquare,
-  FaPython,
+  
 } from "react-icons/fa";
 import {
   SiMongodb,
@@ -39,7 +39,7 @@ const skillCategories = {
     skills: [
       { name: "Java", percentage: 90, icon: <FaJava className="text-orange-500" /> },
       { name: "JavaScript", percentage: 88, icon: <FaJsSquare className="text-yellow-500" /> },
-      { name: "Python", percentage: 82, icon: <FaPython className="text-blue-500" /> },
+     
       { name: "C", percentage: 75, icon: <FaCode className="text-slate-600" /> },
     ],
   },
@@ -77,7 +77,7 @@ const skillCategories = {
     skills: [
       { name: "Node.js", percentage: 88, icon: <FaNodeJs className="text-green-600" /> },
       { name: "Express.js", percentage: 88, icon: <SiExpress className="text-slate-800" /> },
-      { name: "Spring Boot", percentage: 78, icon: <SiSpringboot className="text-emerald-500" /> },
+      { name: "Spring Boot", percentage: 50, icon: <SiSpringboot className="text-emerald-500" /> },
       { name: "REST APIs", percentage: 88, icon: <FaServer className="text-amber-600" /> },
     ],
   },
