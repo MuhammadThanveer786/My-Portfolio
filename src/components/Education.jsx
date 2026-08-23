@@ -35,7 +35,7 @@ const educationData = [
     location: 'Idupulapaya, Andhra Pradesh',
     duration: '2020 – 2022',
     score: 'CGPA: 9.64 / 10',
-    achievement: 'Academic Excellence Award',
+    achievement: 'Strong Academic Performance',
     image: collegeImg,
     color: 'from-yellow-500 to-amber-500',
     activeBorder: 'border-yellow-500',
