@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaEye } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [viewCount, setViewCount] = useState(null);
 
   // Lock background scroll when mobile menu is active
   useEffect(() => {
@@ -13,11 +14,13 @@ const Navbar = () => {
     } else {
       document.body.style.overflow = "unset";
     }
+
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [menuOpen]);
 
+  // Hide navbar on scroll down and show on scroll up
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -25,17 +28,50 @@ const Navbar = () => {
       if (currentScrollY <= 20) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY + 5) {
-        setIsVisible(false); // Hide on scroll down
+        setIsVisible(false);
       } else if (currentScrollY < lastScrollY - 5) {
-        setIsVisible(true);  // Reveal on scroll up
+        setIsVisible(true);
       }
 
       setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  // Portfolio view counter
+  useEffect(() => {
+    const countedThisSession = sessionStorage.getItem(
+      "portfolio_view_counted"
+    );
+
+    const fetchViews = async () => {
+      try {
+        const response = await fetch("/api/visitors", {
+          method: countedThisSession ? "GET" : "POST",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch visitor count");
+        }
+
+        const data = await response.json();
+
+        setViewCount(data.views);
+
+        // Prevent counting multiple times in the same browser tab/session
+        if (!countedThisSession) {
+          sessionStorage.setItem("portfolio_view_counted", "true");
+        }
+      } catch (error) {
+        console.error("Visitor counter error:", error);
+      }
+    };
+
+    fetchViews();
+  }, []);
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -48,71 +84,108 @@ const Navbar = () => {
           isVisible || menuOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-12 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-12 py-3 flex items-center justify-between relative gap-2">
+
           {/* Logo / Name */}
           <a
             href="#home"
             onClick={closeMenu}
-            className="text-lg sm:text-xl md:text-2xl font-bold text-white hover:text-red-400 transition duration-150"
+            className="text-base sm:text-xl md:text-2xl font-bold text-white hover:text-red-400 transition duration-150 whitespace-nowrap flex-shrink-0"
           >
             Muhammad Thanveer Akula
           </a>
 
+          {/* Portfolio View Counter */}
+          <div
+            className="
+              flex items-center gap-1.5
+              px-2.5 py-1
+              rounded-full
+              bg-white/10
+              border border-white/10
+              text-white/90
+              backdrop-blur-sm
+              flex-shrink-0
+
+              md:absolute
+              md:left-1/2
+              md:-translate-x-1/2
+              md:px-3
+              md:gap-2
+            "
+          >
+            <FaEye className="text-red-400 text-xs sm:text-sm" />
+
+            <span className="text-xs sm:text-sm font-medium">
+              {viewCount ?? "…"}
+            </span>
+          </div>
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
+
             <a
               href="#home"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               Home
             </a>
+
             <a
               href="#about"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               About
             </a>
+
             <a
               href="#skills"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               Skills
             </a>
+
             <a
               href="#education"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               Education
             </a>
+
             <a
               href="#projects"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               Projects
             </a>
+
             <a
               href="#contact"
               className="relative text-white/90 text-sm font-medium py-1 transition-colors duration-150 hover:text-red-400 after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-red-400 after:transition-all after:duration-150 hover:after:w-full"
             >
               Contact Me
             </a>
+
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-white text-xl p-1 hover:text-red-400 transition"
+            className="md:hidden text-white text-xl p-1 hover:text-red-400 transition flex-shrink-0"
             aria-label="Toggle navigation menu"
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
+
         </div>
       </nav>
 
       {/* Mobile Full Screen Menu Overlay */}
       {menuOpen && (
         <div className="fixed inset-0 z-[9999] bg-black h-screen w-screen flex flex-col justify-between p-6 md:hidden">
+
           <div className="flex items-center justify-between w-full">
+
             <a
               href="#home"
               onClick={closeMenu}
@@ -120,6 +193,7 @@ const Navbar = () => {
             >
               Muhammad Thanveer Akula
             </a>
+
             <button
               onClick={closeMenu}
               className="text-2xl text-white hover:text-red-400 transition-colors duration-150"
@@ -127,9 +201,11 @@ const Navbar = () => {
             >
               <FaTimes />
             </button>
+
           </div>
 
           <div className="flex flex-col items-center justify-center gap-7 flex-1">
+
             <a
               href="#home"
               onClick={closeMenu}
@@ -137,6 +213,7 @@ const Navbar = () => {
             >
               Home
             </a>
+
             <a
               href="#about"
               onClick={closeMenu}
@@ -144,6 +221,7 @@ const Navbar = () => {
             >
               About
             </a>
+
             <a
               href="#skills"
               onClick={closeMenu}
@@ -151,6 +229,7 @@ const Navbar = () => {
             >
               Skills
             </a>
+
             <a
               href="#education"
               onClick={closeMenu}
@@ -158,6 +237,7 @@ const Navbar = () => {
             >
               Education
             </a>
+
             <a
               href="#projects"
               onClick={closeMenu}
@@ -165,6 +245,7 @@ const Navbar = () => {
             >
               Projects
             </a>
+
             <a
               href="#contact"
               onClick={closeMenu}
@@ -172,6 +253,7 @@ const Navbar = () => {
             >
               Contact Me
             </a>
+
           </div>
         </div>
       )}
